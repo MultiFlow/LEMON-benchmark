@@ -1,0 +1,37 @@
+Benchmark tests on a random digraph (n = 100000, m = 1000000)
+
+ListDigraph - Building                  1.45626
+ListDigraph (sorted arcs) - Building    1.45136
+SmartDigraph - Building                 0.996035
+SmartDigraph (sorted arcs) - Building   0.967469
+StaticDigraph - Building                1.39344
+
+ListDigraph - Iteration
+  NodeIt:    0.0072099          0.0067126
+  ArcIt:     0.198539           0.198938
+  OutArcIt:  0.155848           0.150801
+  InArcIt:   0.154048           0.159836
+
+ListDigraph (sorted arcs) - Iteration
+  NodeIt:    0.00720448         0.00670629
+  ArcIt:     0.194381           0.202951
+  OutArcIt:  0.0869989          0.0806695
+  InArcIt:   0.149996           0.146811
+
+SmartDigraph - Iteration
+  NodeIt:    0.00258529         0.00226789
+  ArcIt:     0.0253954          0.0226732
+  OutArcIt:  0.147429           0.149954
+  InArcIt:   0.147432           0.14323
+
+SmartDigraph (sorted arcs) - Iteration
+  NodeIt:    0.00393109         0.00226779
+  ArcIt:     0.0253948          0.0226794
+  OutArcIt:  0.0962266          0.0759268
+  InArcIt:   0.143696           0.14388
+
+StaticDigraph - Iteration
+  NodeIt:    0.00262511         0.00230808
+  ArcIt:     0.0257938          0.0230783
+  OutArcIt:  0.0338658          0.0437127
+  InArcIt:   0.0912826          0.085961

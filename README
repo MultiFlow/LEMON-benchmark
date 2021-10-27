@@ -1,0 +1,60 @@
+This repository contains various benchmark programs for LEMON 1.x.
+They are groupped thematically into the following directories.
+
+
+graphs -- Digraph Building & Iteration Tests
+--------------------------------------------
+The 'graphs' directory contains a benchmark program (graph_benchmark) for
+directed graph structures. It builds a random digraph of given size and
+iterates over the nodes, the arcs, and the outgoing and incoming arcs of
+each node using ListDigraph, SmartDigraph and StaticDigraph structures.
+
+graph_results.txt contains benchmark results performed on lime.cs.elte.hu
+with gcc 4.1.0 and -O2 optimization.
+
+
+heaps -- Heap Tests
+-------------------
+The 'heaps' directory contains four benchmark programs for the heap structures
+implemented in LEMON.
+
+  * heap_dijkstra_dimacs_benchmark
+    Benchmark Dijkstra algorithm on DIMACS shortest path (sp) or min cost
+    flow (min) files using different heaps.
+
+  * heap_dijkstra_lgf_benchmark
+    Benchmark Dijkstra algorithm on LGF files using different heaps.
+
+  * heap_dijkstra_worst_benchmark
+    Benchmark Dijkstra algorithm on dense "worst case" graphs (i.e. for
+    which a decrease() operation is needed for almost all arcs).
+
+  * heap_sort_benchmark
+    Benchmark heap sort (i.e. call push() and pop() for all items in a
+    vector) using different heaps.
+
+heap_results.txt contains benchmark results performed on lime.cs.elte.hu
+with gcc 4.1.0 and -O2 optimization.
+
+
+libraries -- Libraries Benchmark Tests
+--------------------------------------
+The 'libraries' directory contains several programs for making benchmark
+tests of fundamental algorithm implementations of the graph libraries LEMON,
+BGL and LEDA.
+
+  * dijkstra_benchmark     -  Dijkstra
+  * maxflow_benchmark      -  maximum flow (Preflow)
+  * mincostflow_benchmark  -  minimum cost flow (CostScaling, NetworkSimplex)
+
+All these three programs read a file of DIMACS min cost flow format
+from the standard input and run the corresponding algorithm on it and
+print runing time data to the standard output.
+
+These programs are not included in the standard building process, because their
+compilation also requires the other two libraries. Morover, a few programs
+also require the extension of the LEMON library with LEMON-BGL and BGL-LEMON
+graph adaptors. Such an extension is realized in the libraries/adaptors.bundle
+file. For more information on the usage of these algorithms, see the
+benchmark_config.h file and the *.sh scripts. create_files.sh requires the
+NETGEN graph generator.

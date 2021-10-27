@@ -1,0 +1,73 @@
+USA Road Graphs
+---------------
+Benchmark tests of Dijkstra algorithm on DIMACS USA road graphs:
+
+                   USA-East    USA-West  USA-Center      USA
+n =              3,598,623   6,262,104  14,081,816  23,947,347
+m =              8,778,114  15,248,146  34,292,496  58,333,344
+
+BinHeap
+   real time:      1.37882s    2.76038s    9.2069s     13.8576s
+   # decrease:      255,968     453,036   1,009,707   1,721,827
+
+Relative running times using other heaps:
+
+BinHeap         1           1           1           1
+QuadHeap        1.0125      1.00388     0.95992     0.99249
+DHeap, D=4      1.06953     1.05834     1.00351     1.05584
+DHeap, D=8      1.10841     1.09064     1.0091      1.07601
+DHeap, D=16     1.21442     1.1885      1.07335     1.14117
+FibHeap         2.60177     2.49706     2.00734     2.28037
+PairingHeap     4.32173     4.21006     3.18253     3.61469
+RadixHeap       1.29437     1.25158     1.11141     1.15881
+BucketHeap      1.02371     1.0223      0.87654     0.87517
+
+
+Worst Case Graphs
+-----------------
+Benchmark tests of Dijkstra algorithm on "worst case graphs"
+(for which a decrease() should be called for almost all arcs):
+
+
+n =                  1,000       10,000       20,000
+m =                499,500   49,995,000  199,990,000
+
+BinHeap
+   real time:      0.02595s     2.96707s      9.2069s
+   # decrease:      498,501   49,985,001  199,970,001
+
+Relative running times using other heaps:
+
+BinHeap         1           1           1
+QuadHeap        0.586849    0.598493    0.586294
+DHeap, D=4      0.617215    0.623449    0.60979
+DHeap, D=8      0.538696    0.511745    0.496764
+DHeap, D=16     0.500899    0.465654    0.450195
+DHeap, D=32     0.474184    0.448789    0.425124
+DHeap, D=64     0.503833    0.452305    0.433415
+DHeap, D=128    0.477954    0.415909    0.393518
+FibHeap         1.09494     0.999109    0.948152
+PairingHeap     0.911916    0.827428    0.771995
+RadixHeap       0.377262    0.347746    0.327151
+BucketHeap      0.866452    0.788165    0.777849
+              
+
+Heap Sort
+---------
+Benchmark tests for heap sort.
+
+BinHeap         0.488788    1
+QuadHeap        0.432537    0.884917
+DHeap, D=4      0.438947    0.898031
+DHeap, D=8      0.511928    1.04734
+DHeap, D=16     0.670214    1.37117
+DHeap, D=32     1.00353     2.05309
+DHeap, D=64     1.63422     3.34341
+DHeap, D=128    2.87803     5.8881
+FibHeap         0.50453     1.03221
+PairingHeap     0.606649    1.24113
+RadixHeap       1.09592     2.24211
+BinomialHeap    0.416335    0.85177
+BucketHeap      0.243074    0.497299
+SBucketHeap     0.186032    0.380599
+              
