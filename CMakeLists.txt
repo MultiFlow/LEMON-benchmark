@@ -1,21 +1,32 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+cmake_minimum_required(VERSION 3.15)
 
 ## Here comes the name of your project:
 
-SET(PROJECT_NAME "LEMON Benchmark Programs")
+set(PROJECT_NAME "LEMON Benchmark Programs")
 
 ## Change 'hg-tip' to the current version number of your project if you wish.
 ## Optionally, you can leave it as is and set PROJECT_VERSION from
 ## the cmake-gui when you make a release.
 ## The last parameter is a help string displayed by CMAKE.
 
-SET(PROJECT_VERSION "hg-tip"
+set(PROJECT_VERSION
+    "hg-tip"
     CACHE STRING "${PROJECT_NAME} version string")
 
 ## Do not edit this.
-PROJECT(${PROJECT_NAME})
+project(${PROJECT_NAME})
 
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+# Force default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE
+      "Release"
+      CACHE
+        STRING
+        "Choose the type of build, options are: Debug, Release (default), RelWithDebInfo and MinSizeRel."
+        FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 ## The next part looks for LEMON. Typically, you don't want to modify it.
 ##
@@ -27,83 +38,69 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ## config variable. (Do not hard code it into your config! Others may keep
 ## LEMON at different places.)
 
-IF(EXISTS ${CMAKE_SOURCE_DIR}/lemon)
-  ADD_SUBDIRECTORY(lemon)
-  SET(LEMON_INCLUDE_DIRS
-    ${CMAKE_SOURCE_DIR}/lemon
-    ${CMAKE_BINARY_DIR}/lemon
-  )
-  SET(LEMON_LIBRARIES lemon)
-ELSE()
-  FIND_PACKAGE(LEMON QUIET NO_MODULE)
-  FIND_PACKAGE(LEMON REQUIRED)
-ENDIF()
+include(FetchContent)
+
+FetchContent_Declare(
+  LEMON
+  GIT_REPOSITORY "https://github.com/MultiFlow/LEMON.git"
+  GIT_TAG "multiflow/dev")
+FetchContent_MakeAvailable(LEMON)
 
 ## This line finds doxygen (for document creation)
 
-FIND_PACKAGE(Doxygen)
+find_package(Doxygen)
 
 ## These are the include directories used by the compiler.
 
-INCLUDE_DIRECTORIES(
-  ${PROJECT_SOURCE_DIR}
-  ${PROJECT_BINARY_DIR}
-  ${LEMON_INCLUDE_DIRS}
-)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 ## Here we define executable targets. You can add more source files separated
 ## with whitespaces (including newlines). If you want to build more
 ## executables, simple repeat (and edit) the following ADD_EXECUTABLE and
 ## TARGET_LINK_LIBRARIES statements.
 
-ADD_EXECUTABLE(graph_benchmark graphs/graph_benchmark.cc)
-TARGET_LINK_LIBRARIES(graph_benchmark ${LEMON_LIBRARIES})
+add_executable(graph_benchmark graphs/graph_benchmark.cc)
+target_link_libraries(graph_benchmark LEMON::LEMON)
 
-ADD_EXECUTABLE(heap_dijkstra_dimacs_benchmark heaps/heap_dijkstra_dimacs_benchmark.cc)
-TARGET_LINK_LIBRARIES(heap_dijkstra_dimacs_benchmark ${LEMON_LIBRARIES})
+# Run graph benchmarks
+add_custom_target(graphs COMMAND graph_benchmark 100000 1000000)
 
-ADD_EXECUTABLE(heap_dijkstra_lgf_benchmark heaps/heap_dijkstra_lgf_benchmark.cc)
-TARGET_LINK_LIBRARIES(heap_dijkstra_lgf_benchmark ${LEMON_LIBRARIES})
+add_executable(heap_dijkstra_dimacs_benchmark
+               heaps/heap_dijkstra_dimacs_benchmark.cc)
+target_link_libraries(heap_dijkstra_dimacs_benchmark LEMON::LEMON)
+# Run dijkstra dimacs
+# add_custom_target(dijkstra_dimacs COMMAND heap_dijkstra_dimacs_benchmark
+#                                           data/USA-E.lgf)
 
-ADD_EXECUTABLE(heap_dijkstra_worst_benchmark heaps/heap_dijkstra_worst_benchmark.cc)
-TARGET_LINK_LIBRARIES(heap_dijkstra_worst_benchmark ${LEMON_LIBRARIES})
+add_executable(heap_dijkstra_lgf_benchmark heaps/heap_dijkstra_lgf_benchmark.cc)
+target_link_libraries(heap_dijkstra_lgf_benchmark LEMON::LEMON)
 
-ADD_EXECUTABLE(heap_sort_benchmark heaps/heap_sort_benchmark.cc)
-TARGET_LINK_LIBRARIES(heap_sort_benchmark ${LEMON_LIBRARIES})
+# add_custom_target(dijkstra_ldf COMMAND heap_dijkstra_dimacs_benchmark
+#                                        data/USA-E.lgf)
+
+add_executable(heap_dijkstra_worst_benchmark
+               heaps/heap_dijkstra_worst_benchmark.cc)
+target_link_libraries(heap_dijkstra_worst_benchmark LEMON::LEMON)
+
+add_executable(heap_sort_benchmark heaps/heap_sort_benchmark.cc)
+target_link_libraries(heap_sort_benchmark LEMON::LEMON)
 
 ## This tells cmake to install the executables to $PREFIX/bin when
 ## 'make install' is executed. You can give more targets separated
 ## by whitespaces.
 
-INSTALL(
-  TARGETS graph_benchmark
-  RUNTIME DESTINATION bin
-  COMPONENT bin
-)
+install(TARGETS graph_benchmark RUNTIME DESTINATION bin COMPONENT bin)
 
-INSTALL(
-  TARGETS heap_dijkstra_dimacs_benchmark
-  RUNTIME DESTINATION bin
-  COMPONENT bin
-)
+install(TARGETS heap_dijkstra_dimacs_benchmark RUNTIME DESTINATION bin
+                                                       COMPONENT bin)
 
-INSTALL(
-  TARGETS heap_dijkstra_lgf_benchmark
-  RUNTIME DESTINATION bin
-  COMPONENT bin
-)
+install(TARGETS heap_dijkstra_lgf_benchmark RUNTIME DESTINATION bin
+                                                    COMPONENT bin)
 
-INSTALL(
-  TARGETS heap_dijkstra_worst_benchmark
-  RUNTIME DESTINATION bin
-  COMPONENT bin
-)
+install(TARGETS heap_dijkstra_worst_benchmark RUNTIME DESTINATION bin
+                                                      COMPONENT bin)
 
-INSTALL(
-  TARGETS heap_sort_benchmark
-  RUNTIME DESTINATION bin
-  COMPONENT bin
-)
+install(TARGETS heap_sort_benchmark RUNTIME DESTINATION bin COMPONENT bin)
 
 ## Sometimes MSVC overwhelms you with compiler warnings which are impossible to
 ## avoid. Then comment out these sections. Normally you won't need it as the
@@ -121,12 +118,12 @@ INSTALL(
 # # C4996: 'function': was declared deprecated
 # ENDIF(MSVC)
 
-ENABLE_TESTING()
+enable_testing()
 
 ## The auxiliary doxygen files (.dox) should be placed in the 'doc'
 ## subdirectory. The next line includes the CMAKE config of that directory.
 
-ADD_SUBDIRECTORY(doc)
+add_subdirectory(doc)
 
 #######################################################################
 ## CPACK configuration
@@ -150,50 +147,47 @@ ADD_SUBDIRECTORY(doc)
 ## and/or the files they point to.
 #######################################################################
 
-IF(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
-  SET(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-  SET(CPACK_PACKAGE_VENDOR "EGRES")
-  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
-      "LEMON Benchmark Programs")
-  SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
+if(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
+  set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+  set(CPACK_PACKAGE_VENDOR "EGRES")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "LEMON Benchmark Programs")
+  set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 
-  SET(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+  set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
-  SET(CPACK_PACKAGE_INSTALL_DIRECTORY
-      "${PROJECT_NAME}")
-  SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY
-      "${PROJECT_NAME}")
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
+  set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${PROJECT_NAME}")
 
-  SET(CPACK_COMPONENTS_ALL
-      html_documentation
-      bin)
+  set(CPACK_COMPONENTS_ALL html_documentation bin)
 
-  SET(CPACK_COMPONENT_BIN_DISPLAY_NAME "Command line utilities")
-  SET(CPACK_COMPONENT_HTML_DOCUMENTATION_DISPLAY_NAME "HTML documentation")
+  set(CPACK_COMPONENT_BIN_DISPLAY_NAME "Command line utilities")
+  set(CPACK_COMPONENT_HTML_DOCUMENTATION_DISPLAY_NAME "HTML documentation")
 
-  SET(CPACK_COMPONENT_BIN_DESCRIPTION
-      "Command line utilities")
-  SET(CPACK_COMPONENT_HTML_DOCUMENTATION_DESCRIPTION
+  set(CPACK_COMPONENT_BIN_DESCRIPTION "Command line utilities")
+  set(CPACK_COMPONENT_HTML_DOCUMENTATION_DESCRIPTION
       "Doxygen generated documentation")
 
-  SET(CPACK_GENERATOR "NSIS")
+  set(CPACK_GENERATOR "NSIS")
 
-  SET(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/cmake/nsis/lemon-project.ico")
-  SET(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/cmake/nsis/uninstall.ico")
-  SET(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/cmake/nsis\\\\installer.bmp")
-  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\lemon-project.ico")
+  set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/cmake/nsis/lemon-project.ico")
+  set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/cmake/nsis/uninstall.ico")
+  set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/cmake/nsis\\\\installer.bmp")
+  set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\lemon-project.ico")
 
-  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${PROJECT_NAME}")
-  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lemon.cs.elte.hu")
-  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lemon.cs.elte.hu")
-  SET(CPACK_NSIS_CONTACT "lemon-user@lemon.cs.elte.hu")
-  SET(CPACK_NSIS_CREATE_ICONS_EXTRA "
+  set(CPACK_NSIS_DISPLAY_NAME
+      "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${PROJECT_NAME}")
+  set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lemon.cs.elte.hu")
+  set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lemon.cs.elte.hu")
+  set(CPACK_NSIS_CONTACT "lemon-user@lemon.cs.elte.hu")
+  set(CPACK_NSIS_CREATE_ICONS_EXTRA
+      "
       CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Documentation.lnk\\\" \\\"$INSTDIR\\\\share\\\\doc\\\\index.html\\\"
       ")
-  SET(CPACK_NSIS_DELETE_ICONS_EXTRA "
+  set(CPACK_NSIS_DELETE_ICONS_EXTRA
+      "
       !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
       Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\Documentation.lnk\\\"
       ")
 
-  INCLUDE(CPack)
-ENDIF(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
+  include(CPack)
+endif(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
